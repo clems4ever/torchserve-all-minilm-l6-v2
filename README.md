@@ -1,4 +1,4 @@
-# TorchServe Embeddings
+# Running all-MiniLM-L6-v2 with TorchServe 
 
 This repository contains everything needed to deploy a production-ready service for
 computing sentence embeddings for similarity computation using the model
