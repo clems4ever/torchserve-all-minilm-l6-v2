@@ -29,8 +29,9 @@ sentence_embeddings = mean_pooling(model_output, encoded_input['attention_mask']
 # Normalize embeddings
 sentence_embeddings = F.normalize(sentence_embeddings, p=2, dim=1)
 
-print("Sentence embeddings:")
-print(sentence_embeddings.size())
+print("Sentence embeddings has been computed successfully, the model is working!")
+
+# We can now dump the model on disk
 
 # save tokenizer
 tokenizer.save_pretrained('./my_tokenizer')

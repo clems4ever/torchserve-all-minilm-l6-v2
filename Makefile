@@ -1,10 +1,12 @@
-init:
-	pip install -r requirements.txt
+build-archive:
+	python dump_model.py
+	./scripts/create-archive.sh
 
-start-server:
+build-docker:
+	docker build -t torchserve-all-minilm-l6-v2 .
+
+serve: build-archive
 	bash ./scripts/start-torchserve.sh
 
-stop-server:
-	bash ./scripts/stop-torchserve.sh
 
-.PHONY: init test
+.PHONY: test

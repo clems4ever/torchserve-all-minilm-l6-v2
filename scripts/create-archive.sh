@@ -1,5 +1,6 @@
 #!/bin/bash
 
+rm -rf model_store
 mkdir -p model_store
 
 torch-model-archiver \
