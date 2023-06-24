@@ -20,11 +20,18 @@ There are two ways to test the server, by running it as a process or as a docker
 First, make sure you have docker installed.
 
 ```make
-make build-docker
-docker run -p 8080:8080 --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 -it torchserve-all-minilm-l6-v2
+docker run -p 8080:8080 --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 -it ghcr.io/clems4ever/torchserve-all-minilm-l6-v2:latest
 ```
 
 Then, go to [Usage](#usage) to check how to use the service.
+
+Note that the settings used are the ones documented in the 
+[torchserve documentation](https://github.com/pytorch/serve/blob/master/docker/README.md#running-torchserve-in-a-production-docker-environment)
+
+Also note that by using this docker image and even if you have a GPU available, the inferences will be done on CPU with
+the basic capabilities, i.e., without leveraging any CPU extension. If you want to leverage your GPU or some CPU
+capabilities, you need to adapt the Dockerfile according to the documentation of
+[torchserve](https://github.com/pytorch/serve/blob/master/docker/README.md).
 
 ### Deploy as a process
 
@@ -34,7 +41,8 @@ First, make sure you have Python 3 and Java 11+ installed.
 make serve
 ```
 
-Then, go to [Usage](#usage) to check how to use the service.
+Then, go to [Usage](#usage) to check how to use the service. If you have a GPU available, it will use it for faster
+inferences.
 
 ### Usage
 
