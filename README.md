@@ -53,7 +53,7 @@ This should start a server localy that you can query with a curl like the follow
 curl --location 'http://127.0.0.1:8080/predictions/my_model' \
 --header 'Content-Type: application/json' \
 --data '{
-    "input": ["hello", "hi"]
+    "input": ["hello, how are you?", "hi, what is up?"]
 }'
 ```
 
