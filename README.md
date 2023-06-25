@@ -61,13 +61,18 @@ You should get an output similar to
 ```bash
 [
   [
-    0.016306497156620026,
-    0.10300007462501526,
-    -0.17589513957500458,
-    -0.010497087612748146,
-    -0.06088363379240036,
-    0.00311004975810647,
-    0.07295241206884384,
+    0.019096793606877327,
+    0.03446517512202263,
+    0.09162796288728714,
+    0.0701652243733406,
+    -0.029946573078632355,
+    ...
+  ],
+  [
+    -0.06470940262079239,
+    -0.03830110654234886,
+    0.013061972334980965,
+    -0.0003482792235445231,
     ...
   ]
 ]
@@ -75,12 +80,18 @@ You should get an output similar to
 
 ## Aknowledgments
 
-Many thanks to [Stane Aurelius](https://supertype.ai/author/saurelius/) who wrote
+Many thanks to:
+
+- [Stane Aurelius](https://supertype.ai/author/saurelius/) who wrote
 [a great post](https://supertype.ai/notes/serving-pytorch-w-torchserve/) about the details on how to deploy a model with
 tochserve. I highly recommend reading it.
 
-Many thanks to the community publishing models on [HuggingFace](https://huggingface.co/) and particularly to the team who
+- The community publishing models on [HuggingFace](https://huggingface.co/) and particularly to the team who
 have produced the [all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2) model and have shared it.
+
+- The Microsoft Research team who produced the paper about [MiniLM](https://arxiv.org/abs/2002.10957).
+
+- The [HuggingFace](https://huggingface.co/) team who hosts the models and make them easily available to everyone.
 
 ## License
 
