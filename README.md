@@ -1,15 +1,16 @@
 # Running all-MiniLM-L6-v2 with TorchServe 
 
 This repository contains everything needed to deploy a production-ready service for
-computing sentence embeddings for similarity computation using the model
-[all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2).
+computing sentence similarity embeddings using the model
+[all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2) and TorchServe.
+Those embeddings can then be used in combination with a vector database like Pinecone, Milvus,
+Weaviate or Qdrant.
 
-This model is used for computing sentence similarities. It can be used in combination with a vector database
-like pinecone, milvus, weaviate or qdrant.
+This repository has been created because there was no simple example in the torchserve repository
+for deploying a huggingface model for sentence similarity. The closest I could find was resources
+for sequence classification, generation, question answering, and token classification as you can
+check [here](https://github.com/pytorch/serve/tree/master/examples/Huggingface_Transformers).
 
-This repository has been created because there was no example in the torchserve repository for deploying
-a huggingface model for sentence similarity, there are only resources for sequence classification, generation, question answering,
-and token classification as you can check [here](https://github.com/pytorch/serve/tree/master/examples/Huggingface_Transformers).
 
 ## Get Started
 
@@ -20,18 +21,18 @@ There are two ways to test the server, by running it as a process or as a docker
 First, make sure you have docker installed.
 
 ```make
-docker run -p 8080:8080 --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 -it ghcr.io/clems4ever/torchserve-all-minilm-l6-v2:latest
+docker run -p 8080:8080 -it ghcr.io/clems4ever/torchserve-all-minilm-l6-v2:latest
 ```
 
 Then, go to [Usage](#usage) to check how to use the service.
 
-Note that the settings used are the ones documented in the 
-[torchserve documentation](https://github.com/pytorch/serve/blob/master/docker/README.md#running-torchserve-in-a-production-docker-environment)
+Note that the command can be further optimized for production by using settings documented in the 
+[TorchServe documentation](https://github.com/pytorch/serve/blob/master/docker/README.md#running-torchserve-in-a-production-docker-environment)
 
 Also note that by using this docker image and even if you have a GPU available, the inferences will be done on CPU with
 the basic capabilities, i.e., without leveraging any CPU extension. If you want to leverage your GPU or some CPU
 capabilities, you need to adapt the Dockerfile according to the documentation of
-[torchserve](https://github.com/pytorch/serve/blob/master/docker/README.md).
+[TorchServe](https://github.com/pytorch/serve/blob/master/docker/README.md).
 
 ### Deploy as a process
 
