@@ -6,6 +6,9 @@ computing sentence similarity embeddings using the model
 Those embeddings can then be used in combination with a vector database like Pinecone, Milvus,
 Weaviate or Qdrant.
 
+More details about it is provided in
+[this article](https://medium.com/@clement.michaud/deploying-a-production-ready-embeddings-service-with-pytorch-378fb591d24e).
+
 This repository has been created because there was no simple example in the torchserve repository
 for deploying a huggingface model for sentence similarity. The closest I could find was resources
 for sequence classification, generation, question answering, and token classification as you can
