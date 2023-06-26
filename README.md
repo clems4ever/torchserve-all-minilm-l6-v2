@@ -81,6 +81,10 @@ You should get an output similar to
 ]
 ```
 
+## Future Work
+
+- TochServe uses a Java server to expose the API which is heavy. Checking the stats from Docker, the service takes about 4GB of RAM. I will check how I can optimize the RAM usage with Go bindings to reduce the footprint.
+
 ## Aknowledgments
 
 Many thanks to:
