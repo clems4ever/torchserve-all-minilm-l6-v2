@@ -65,24 +65,7 @@ class ModelHandler(BaseHandler):
 
         self.initialized = True
 
-    def preprocess(self, requests):
-        """
-        Tokenize the input text using the suitable tokenizer and convert 
-        it to tensor
-
-        Args:
-            requests: A list containing a dictionary, might be in the form
-            of [{'body': json_file}] or [{'data': json_file}]
-        Returns:
-            the tensor containing the batch of token vectors.
-        """
-
-        # unpack the data
-        data = requests[0].get('body')
-        if data is None:
-            data = requests[0].get('data')
-
-        texts = data.get('input')
+    def preprocess_text(self, texts):
         logger.info(f'Received {len(texts)} texts. Begin tokenizing')
 
         # tokenize the texts
@@ -94,15 +77,48 @@ class ModelHandler(BaseHandler):
         logger.info('Tokenization process completed')
         return tokenized_data
 
+    def preprocess(self, requests):
+        """
+        Tokenize the input text using the suitable tokenizer and convert 
+        it to tensor
+
+        If token_ids is provided, the json must be of the form
+        {'input_ids': [[101, 102]], 'token_type_ids': [[0, 0]], 'attention_mask': [[1, 1]]}
+
+        Args:
+            requests: A list containing a dictionary, might be in the form
+            of [{'body': json_file}] or [{'data': json_file}] or [{'token_ids': json_file}]
+        Returns:
+            the tensor containing the batch of token vectors.
+        """
+
+        # unpack the data
+        data = requests[0].get('body')
+        if data is None:
+            data = requests[0].get('data')
+        
+        texts = data.get('input')
+        if texts is not None:
+            logger.info('Text provided')
+            return self.preprocess_text(texts)
+
+        encodings = data.get('encodings')
+        if encodings is not None:
+            logger.info('Encodings provided')
+            return transformers.BatchEncoding(data={k: torch.tensor(v) for k, v in encodings.items()})
+
+        raise Exception("unsupported payload")
+
     def inference(self, inputs):
         """
         Compute the embeddings given the batch of tokens.
 
         Args:
-            inputs: tensor of tokenized data (Shape=(2, 384)).
+            inputs: encoded data
         Returns:
             the tensor containing the batch embeddings.
         """
+        print(inputs)
 
         with torch.no_grad():
             model_output = self.model(**inputs.to(self.device))
