@@ -1,5 +1,5 @@
 # Builder image
-FROM pytorch/torchserve AS builder
+FROM ghcr.io/alexgseymour/torch-serve-arm64:latest AS builder
 
 WORKDIR /usr/app
 ADD requirements.txt .
@@ -14,7 +14,7 @@ ADD scripts/create-archive.sh scripts/create-archive.sh
 RUN ./scripts/create-archive.sh
 
 # Production image
-FROM pytorch/torchserve
+FROM ghcr.io/alexgseymour/torch-serve-arm64:latest
 
 ADD requirements.txt .
 RUN pip install -r requirements.txt
