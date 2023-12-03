@@ -1,40 +1,23 @@
-from transformers import AutoTokenizer, AutoModel
-import torch
-import torch.nn.functional as F
-
-#Mean Pooling - Take attention mask into account for correct averaging
-def mean_pooling(model_output, attention_mask):
-    token_embeddings = model_output[0] #First element of model_output contains all token embeddings
-    input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
-    return torch.sum(token_embeddings * input_mask_expanded, 1) / torch.clamp(input_mask_expanded.sum(1), min=1e-9)
-
+import sentence_transformers 
+from sentence_transformers import SentenceTransformer, CrossEncoder
 
 # Sentences we want sentence embeddings for
 sentences = ['This is an example sentence', 'Each sentence is converted']
 
 # Load model from HuggingFace Hub
-tokenizer = AutoTokenizer.from_pretrained('sentence-transformers/all-MiniLM-L6-v2')
-model = AutoModel.from_pretrained('sentence-transformers/all-MiniLM-L6-v2')
+model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 
-# Tokenize sentences
-encoded_input = tokenizer(sentences, padding=True, truncation=True, return_tensors='pt')
-
-# Compute token embeddings
-with torch.no_grad():
-    model_output = model(**encoded_input)
-
-# Perform pooling
-sentence_embeddings = mean_pooling(model_output, encoded_input['attention_mask'])
-
-# Normalize embeddings
-sentence_embeddings = F.normalize(sentence_embeddings, p=2, dim=1)
+# Create embeddigs + normalisation
+model.encode(sentences=sentences, normalize_embeddings=True, convert_to_tensor= True)
 
 print("Sentence embeddings has been computed successfully, the model is working!")
 
 # We can now dump the model on disk
+model.save("./embedder")
 
-# save tokenizer
-tokenizer.save_pretrained('./my_tokenizer')
-
-# save model
-model.save_pretrained('./my_model')
+question = "how are you doing?"
+model = CrossEncoder("cross-encoder/ms-marco-TinyBERT-L-2-v2")
+inputs = [[question, sentence] for sentence in sentences]
+out = model.predict(inputs)
+print(out)
+model.save("./cross_encoder")

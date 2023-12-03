@@ -8,7 +8,7 @@ RUN pip install -r requirements.txt
 ADD dump_model.py .
 RUN python dump_model.py
 
-ADD handler.py .
+COPY handlers ./
 ADD scripts/create-archive.sh scripts/create-archive.sh
 
 RUN ./scripts/create-archive.sh

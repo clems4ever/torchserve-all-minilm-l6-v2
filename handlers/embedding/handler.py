@@ -1,21 +1,13 @@
 import torch
-import torch.nn.functional as F
-
 import logging
-import transformers
+import sentence_transformers 
 import os
 
 from ts.torch_handler.base_handler import BaseHandler
-from transformers import AutoModel, AutoTokenizer
+from sentence_transformers import SentenceTransformer
 
 logger = logging.getLogger(__name__)
-logger.info("Transformers version %s", transformers.__version__)
-
-#Mean Pooling - Take attention mask into account for correct averaging
-def mean_pooling(model_output, attention_mask):
-    token_embeddings = model_output[0] #First element of model_output contains all token embeddings
-    input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
-    return torch.sum(token_embeddings * input_mask_expanded, 1) / torch.clamp(input_mask_expanded.sum(1), min=1e-9)
+logger.info("Transformers version %s", sentence_transformers.__version__)
 
 
 class ModelHandler(BaseHandler):
@@ -49,47 +41,25 @@ class ModelHandler(BaseHandler):
         model_path = os.path.join(model_dir, model_file)
 
         if os.path.isfile(model_path):
-            self.model = AutoModel.from_pretrained(model_dir)
+            self.model = SentenceTransformer(model_dir, device=self.device)
             self.model.to(self.device)
             self.model.eval()
             logger.info(f'Successfully loaded model from {model_file}')
         else:
             raise RuntimeError('Missing the model file')
 
-        # load tokenizer
-        self.tokenizer = AutoTokenizer.from_pretrained(model_dir)
-        if self.tokenizer is not None:
-            logger.info('Successfully loaded tokenizer')
-        else:
-            raise RuntimeError('Missing tokenizer')
-
         self.initialized = True
 
-    def preprocess_text(self, texts):
-        logger.info(f'Received {len(texts)} texts. Begin tokenizing')
-
-        # tokenize the texts
-        tokenized_data = self.tokenizer(texts,
-                                        padding=True,
-                                        truncation=True,
-                                        return_tensors='pt')
-
-        logger.info('Tokenization process completed')
-        return tokenized_data
 
     def preprocess(self, requests):
         """
-        Tokenize the input text using the suitable tokenizer and convert 
-        it to tensor
-
-        If token_ids is provided, the json must be of the form
-        {'input_ids': [[101, 102]], 'token_type_ids': [[0, 0]], 'attention_mask': [[1, 1]]}
+        Extracts the text from the request
 
         Args:
             requests: A list containing a dictionary, might be in the form
             of [{'body': json_file}] or [{'data': json_file}] or [{'token_ids': json_file}]
         Returns:
-            the tensor containing the batch of token vectors.
+            the list of strings.
         """
 
         # unpack the data
@@ -100,32 +70,28 @@ class ModelHandler(BaseHandler):
         texts = data.get('input')
         if texts is not None:
             logger.info('Text provided')
-            return self.preprocess_text(texts)
-
-        encodings = data.get('encodings')
-        if encodings is not None:
-            logger.info('Encodings provided')
-            return transformers.BatchEncoding(data={k: torch.tensor(v) for k, v in encodings.items()})
+            return texts
 
         raise Exception("unsupported payload")
 
-    def inference(self, inputs):
+    def inference(self, texts):
         """
-        Compute the embeddings given the batch of tokens.
+        Compute the embeddings given the list of strings.
 
         Args:
-            inputs: encoded data
+            inputs: list of strings
         Returns:
             the tensor containing the batch embeddings.
         """
-        print(inputs)
+        # print(inputs)
 
-        with torch.no_grad():
-            model_output = self.model(**inputs.to(self.device))
-        sentence_embeddings = mean_pooling(model_output, inputs['attention_mask'])
-        sentence_embeddings = F.normalize(sentence_embeddings, p=2, dim=1)
+        text_embeddings = self.model.encode(texts,
+                                           normalize_embeddings=True,
+                                           convert_to_tensor= True,
+                                           device=self.device)
+
         logger.info('Embeddings successfully computed')
-        return sentence_embeddings
+        return text_embeddings
     
     def postprocess(self, outputs: list):
         """

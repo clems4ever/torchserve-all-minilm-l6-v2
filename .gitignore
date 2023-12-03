@@ -2,3 +2,7 @@ logs/
 model_store/
 my_model/
 my_tokenizer/
+cross_encoder_model_files/
+embedder_model_files/
+model_store/
+config.properties
