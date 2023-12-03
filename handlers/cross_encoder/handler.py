@@ -1,5 +1,4 @@
 import torch
-from typing import List
 import logging
 import os
 import sentence_transformers
@@ -7,21 +6,20 @@ from ts.torch_handler.base_handler import BaseHandler
 from sentence_transformers import CrossEncoder
 
 logger = logging.getLogger(__name__)
-logger.info("Cross_encoder version %s", sentence_transformers.__version__)
+logger.info("sentence_transformers version %s", sentence_transformers.__version__)
 
 
 class ModelHandler(BaseHandler):
     def initialize(self, context):
         """
-        Initialize function loads the model and the tokenizer
+        Initialize function loads the model
 
         Args:
             context (context): It is a JSON Object containing information
             pertaining to the model artifacts parameters.
 
         Raises:
-            RuntimeError: Raises the Runtime error when the model or
-            tokenizer is missing
+            RuntimeError: Raises the Runtime error when the model is missing
         """
 
         properties = context.system_properties
@@ -51,11 +49,11 @@ class ModelHandler(BaseHandler):
 
     def preprocess(self, requests):
         """
-        Extracts the text from the request
+        Extracts the question and references from the request
 
         Args:
             requests: A list containing a dictionary, might be in the form
-            of [{'body': json_file}] or [{'data': json_file}] or [{'token_ids': json_file}]
+            of [{'body': json_file}] or [{'data': json_file}]]
         Returns:
             the list of strings.
         """
@@ -73,14 +71,14 @@ class ModelHandler(BaseHandler):
         return [[question, reference] for reference in references]
         
     
-    def inference(self, inputs: List[str]):
+    def inference(self, inputs):
         """
-        Compute the embeddings given the batch of tokens.
+        Compute the relevance scores for the provided inputs.
 
         Args:
-            inputs: encoded data
+            inputs: list of lists of strings [["question", "reference1"], ["question", "reference2"]]
         Returns:
-            the tensor containing the batch embeddings.
+            numpy array with the relevance scores 
         """
         print(inputs)
 
@@ -92,12 +90,12 @@ class ModelHandler(BaseHandler):
     
     def postprocess(self, outputs):
         """
-        Convert the tensor into a list.
+        Convert the numpy array into a list.
 
         Args:
-            outputs: tensor containing the embeddings.
+            outputs: numpy array containing the relevance scores
         Returns:
-            the list of list of floating point representing the embeddings for the batch.
+            a list containing the relevance scores
         """
         logger.info('Postprocessing successfully computed')
         return [outputs.tolist()]

@@ -57,7 +57,7 @@ class ModelHandler(BaseHandler):
 
         Args:
             requests: A list containing a dictionary, might be in the form
-            of [{'body': json_file}] or [{'data': json_file}] or [{'token_ids': json_file}]
+            of [{'body': json_file}] or [{'data': json_file}]
         Returns:
             the list of strings.
         """
